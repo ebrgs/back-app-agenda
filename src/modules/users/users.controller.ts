@@ -36,6 +36,10 @@ export class UsersController {
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(id);
   }
+  @Get('/user/:email')
+  findByEmail(@Param('email') email: string) {
+    return this.usersService.findByEmail(email);
+  }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -54,5 +58,17 @@ export class UsersController {
     @Request() req: iTokenRequest,
   ) {
     return this.usersService.createContact(createContactDto, req.user.userId);
+  }
+
+  @Delete('contact/:id')
+  @UseGuards(TokenAuthGuard)
+  deleteContact(@Param('id') id: string) {
+    return this.usersService.deleteContact(id);
+  }
+
+  @Patch('contact/:id')
+  @UseGuards(TokenAuthGuard)
+  updateContact(@Body() data: any, @Param('id') id: string) {
+    return this.usersService.updateContact(data, id);
   }
 }

@@ -16,7 +16,7 @@ export class UsersService {
     const user = this.usersRepository.create(data);
     await this.usersRepository.save(data);
 
-    return await this.findOne(user.id);
+    return user;
   }
   async findAll(): Promise<User[]> {
     const list = await this.usersRepository.find();
@@ -24,7 +24,6 @@ export class UsersService {
     return list;
   }
   async findOne(id: string): Promise<User> {
-    console.log(id);
     const user = await this.usersRepository
       .createQueryBuilder('user')
       .where('user.id = :id_user', { id_user: id })
@@ -72,5 +71,36 @@ export class UsersService {
       .createQueryBuilder('contacts')
       .where('contacts.user.id = :id_user', { id_user: userId })
       .getOne();
+  }
+
+  async deleteContact(id: string) {
+    const contact = await this.contactsRepository
+      .createQueryBuilder('contacts')
+      .where('contacts.id = :id_contact', { id_contact: id })
+      .getOne();
+    if (!contact) {
+      throw new NotFoundException('contato não encontrado');
+    }
+    await this.contactsRepository.delete({ id });
+  }
+
+  async updateContact(data: any, id: string) {
+    if (!data.email) {
+      delete data.email;
+    }
+    if (!data.name) {
+      delete data.name;
+    }
+    if (!data.phone) {
+      delete data.phone;
+    }
+    const contact = await this.contactsRepository
+      .createQueryBuilder('contacts')
+      .where('contacts.id = :id_contact', { id_contact: id })
+      .getOne();
+    if (!contact) {
+      throw new NotFoundException('contato não encontrado');
+    }
+    await this.contactsRepository.update({ id }, data);
   }
 }
